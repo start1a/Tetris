@@ -525,8 +525,7 @@ static void Block_Create(int* frames, struct Player *p, Sound *s_arrival)
         else                                                                                // No
         {
             for (int i = 0; i < 4; i++)                                                     // Keep going Down
-                //p->blockX[i]++
-                ;
+                p->blockX[i]++;
         }
         
     }
