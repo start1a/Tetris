@@ -29,7 +29,7 @@ GameScreen gameScreen = MAIN;
 
 
 // Player variables struct
-struct Player {
+typedef struct{
     int player_number;
     bool block_Arrival;
     int Attack;
@@ -47,7 +47,7 @@ struct Player {
     int block_arriveY[4];
     int block_next[4][2];
     int Grid[GRID_VERTICAL][GRID_HORIZONTAL];
-};
+}Player;
 
 typedef struct {
     Vector2 position;
@@ -110,8 +110,8 @@ int main()
     }
     
     // Create Player ----------------------------
-    struct Player p1 = { 1,1,0,0,0,0,50  };
-    struct Player p2 = { 2,1,0,0,0,0,700 };
+    Player p1 = { 1,1,0,0,0,0,50  };
+    Player p2 = { 2,1,0,0,0,0,700 };
     
     InitWindow(screenWidth, screenHeight, "MY TETRIS");
     SetTargetFPS(60);
@@ -353,7 +353,7 @@ int main()
 
 
 
-static void Init_Game(struct Player *p)
+static void Init_Game(Player *p)
 {
     for(int i = 0; i < GRID_VERTICAL; i++)
     {
@@ -392,8 +392,8 @@ static void Draw_InitGame()
     for (int i = 0; i < GRID_VERTICAL+1; i++)
     {
 
-        DrawLine(50, 50+(i*GRID_LENGTH), 50+(GRID_LENGTH*GRID_HORIZONTAL), 50+(i*GRID_LENGTH), BLUE);
-        DrawLine(700, 50+(i*GRID_LENGTH), 700+(GRID_LENGTH*GRID_HORIZONTAL), 50+(i*GRID_LENGTH), BLUE);
+        DrawLine(50, 50+(i*GRID_LENGTH), 50+(GRID_LENGTH*GRID_HORIZONTAL), 50+(i*GRID_LENGTH), BLACK);
+        DrawLine(700, 50+(i*GRID_LENGTH), 700+(GRID_LENGTH*GRID_HORIZONTAL), 50+(i*GRID_LENGTH), BLACK);
 
     }
 
@@ -401,26 +401,26 @@ static void Draw_InitGame()
     for (int i = 0; i < GRID_HORIZONTAL+1; i++)
     {
 
-        DrawLine(50+(i*GRID_LENGTH), 50, 50+(i*GRID_LENGTH), 50+(GRID_LENGTH*GRID_VERTICAL), BLUE);
-        DrawLine(700+(i*GRID_LENGTH), 50, 700+(i*GRID_LENGTH), 50+(GRID_LENGTH*GRID_VERTICAL), BLUE);
+        DrawLine(50+(i*GRID_LENGTH), 50, 50+(i*GRID_LENGTH), 50+(GRID_LENGTH*GRID_VERTICAL), BLACK);
+        DrawLine(700+(i*GRID_LENGTH), 50, 700+(i*GRID_LENGTH), 50+(GRID_LENGTH*GRID_VERTICAL), BLACK);
         
     }
     
     // Draw Next Block Grid Line
     for (int i = 0; i < 5; i++)
     {
-        DrawLine(80+(GRID_LENGTH*GRID_HORIZONTAL), 50+(i*GRID_LENGTH), 80+(GRID_LENGTH*4)+(GRID_LENGTH*GRID_HORIZONTAL), 50+(i*GRID_LENGTH), BLUE);
-        DrawLine(730+(GRID_LENGTH*GRID_HORIZONTAL),  50+(i*GRID_LENGTH), 730+(GRID_LENGTH*4)+(GRID_LENGTH*GRID_HORIZONTAL), 50+(i*GRID_LENGTH), BLUE);
+        DrawLine(80+(GRID_LENGTH*GRID_HORIZONTAL), 50+(i*GRID_LENGTH), 80+(GRID_LENGTH*4)+(GRID_LENGTH*GRID_HORIZONTAL), 50+(i*GRID_LENGTH), BLACK);
+        DrawLine(730+(GRID_LENGTH*GRID_HORIZONTAL),  50+(i*GRID_LENGTH), 730+(GRID_LENGTH*4)+(GRID_LENGTH*GRID_HORIZONTAL), 50+(i*GRID_LENGTH), BLACK);
         
-        DrawLine(80+(GRID_LENGTH*GRID_HORIZONTAL)+(i*GRID_LENGTH), 50, 80+(GRID_LENGTH*GRID_HORIZONTAL)+(i*GRID_LENGTH), 50+(GRID_LENGTH*4), BLUE);
-        DrawLine(730+(GRID_LENGTH*GRID_HORIZONTAL)+(i*GRID_LENGTH), 50, 730+(GRID_LENGTH*GRID_HORIZONTAL)+(i*GRID_LENGTH), 50+(GRID_LENGTH*4), BLUE);
+        DrawLine(80+(GRID_LENGTH*GRID_HORIZONTAL)+(i*GRID_LENGTH), 50, 80+(GRID_LENGTH*GRID_HORIZONTAL)+(i*GRID_LENGTH), 50+(GRID_LENGTH*4), BLACK);
+        DrawLine(730+(GRID_LENGTH*GRID_HORIZONTAL)+(i*GRID_LENGTH), 50, 730+(GRID_LENGTH*GRID_HORIZONTAL)+(i*GRID_LENGTH), 50+(GRID_LENGTH*4), BLACK);
     }
 
 }
 
 
 // Random Block Selected
-static void Block_Create(int* frames, struct Player *p, Sound *s_arrival)
+static void Block_Create(int* frames, Player *p, Sound *s_arrival)
 {
     if (p->block_Arrival)
     {
@@ -550,14 +550,14 @@ static void Block_Create(int* frames, struct Player *p, Sound *s_arrival)
 
 
 // Check & Save the Block State 
-static void Block_Save(struct Player *p)
+static void Block_Save(Player *p)
 {
     
     // Draw Block
     for (int i = 0; i < 4; i++)
     {
-        DrawRectangle(p->block_location+(GRID_LENGTH*p->blockY[i]), 50+(GRID_LENGTH*p->blockX[i]), GRID_LENGTH, GRID_LENGTH, WHITE);
-        DrawRectangle(p->block_location+1+(GRID_LENGTH*p->blockY[i]), 51+(GRID_LENGTH*p->blockX[i]), GRID_LENGTH-2, GRID_LENGTH-2, color[p->block_number]);
+        DrawRectangle(p->block_location+(GRID_LENGTH*p->blockY[i]), 50+(GRID_LENGTH*p->blockX[i]), GRID_LENGTH-2, GRID_LENGTH-2, WHITE);
+        DrawRectangle(p->block_location+1+(GRID_LENGTH*p->blockY[i]), 51+(GRID_LENGTH*p->blockX[i]), GRID_LENGTH-3, GRID_LENGTH-3, color[p->block_number]);
         DrawRectangle(p->block_location+(GRID_LENGTH*p->block_arriveY[i]), 50+(GRID_LENGTH*p->block_arriveX[i]), GRID_LENGTH, GRID_LENGTH, Fade(PURPLE, 0.3));
     }
     
@@ -568,22 +568,24 @@ static void Block_Save(struct Player *p)
         {
             if (p->Grid[i][j] != -1)
             {
-                DrawRectangle(p->block_location+(GRID_LENGTH*j), 50+(GRID_LENGTH*i), GRID_LENGTH, GRID_LENGTH, WHITE);
-                DrawRectangle(p->block_location+1+(GRID_LENGTH*j), 51+(GRID_LENGTH*i), GRID_LENGTH-2, GRID_LENGTH-2, color[p->Grid[i][j]]);
+                DrawRectangle(p->block_location+(GRID_LENGTH*j), 50+(GRID_LENGTH*i), GRID_LENGTH-2, GRID_LENGTH-2, WHITE);
+                DrawRectangle(p->block_location+1+(GRID_LENGTH*j), 51+(GRID_LENGTH*i), GRID_LENGTH-3, GRID_LENGTH-3, color[p->Grid[i][j]]);
             }
         }
     }
     
     for (int i = 0; i < 4; i++)
         for(int j = 0; j < 2; j++)
-            DrawRectangle(p->block_location+30+(GRID_LENGTH*GRID_HORIZONTAL)+(GRID_LENGTH*p->block_next[i][1]), 50+(p->block_next[i][0]*GRID_LENGTH), GRID_LENGTH, GRID_LENGTH, color[p->block_number2]);
-
+        {
+            DrawRectangle(p->block_location+30+(GRID_LENGTH*GRID_HORIZONTAL)+(GRID_LENGTH*p->block_next[i][1]), 50+(p->block_next[i][0]*GRID_LENGTH), GRID_LENGTH-2, GRID_LENGTH-2, WHITE);
+            DrawRectangle(p->block_location+31+(GRID_LENGTH*GRID_HORIZONTAL)+(GRID_LENGTH*p->block_next[i][1]), 51+(p->block_next[i][0]*GRID_LENGTH), GRID_LENGTH-3, GRID_LENGTH-3, color[p->block_number2]);
+        }
 }
 
 
 
 // Control the Block by using Direction Key
-void Block_Control(struct Player *p, Sound *s_arrival, Sound *s_rotation)
+void Block_Control(Player *p, Sound *s_arrival, Sound *s_rotation)
 {
     
     // Block is Arrive immediately
@@ -970,7 +972,7 @@ void Block_Control(struct Player *p, Sound *s_arrival, Sound *s_rotation)
 
 
 // Check Block Collision
-static bool Check_Blocks_Collision(struct Player *p, int ArrayX[], int ArrayY[], int x, int y)
+static bool Check_Blocks_Collision(Player *p, int ArrayX[], int ArrayY[], int x, int y)
 {
     
     // Index >= 0
@@ -1037,7 +1039,7 @@ static bool Check_Wall(int Array[], int ch, int i)
 }
 
 
-static bool Block_Adjust(struct Player *p, int ArrayX[], int ArrayY[], int x1, int x2, int x3, int x4, int y1, int y2, int y3, int y4)
+static bool Block_Adjust(Player *p, int ArrayX[], int ArrayY[], int x1, int x2, int x3, int x4, int y1, int y2, int y3, int y4)
 {
     ArrayX[0] = p->blockX[0] + x1, ArrayX[1] = p->blockX[1] + x2, ArrayX[2] = p->blockX[2] + x3, ArrayX[3] = p->blockX[3] + x4,
     
@@ -1064,7 +1066,7 @@ static void Block_Change(int Array_X1[], int Array_Y1[], int Array_X2[], int Arr
 
 
 // Delete full block line
-static void BlockLine_Delete(struct Player *p, Sound *s)
+static void BlockLine_Delete(Player *p, Sound *s)
 {
     
     int Deleted_Line = -1;
@@ -1123,7 +1125,7 @@ static void BlockLine_Delete(struct Player *p, Sound *s)
 
 
 // Destroy 1 line -> Attack 1 line to other players
-void Attack_Player(struct Player *p, int num_Attack)
+void Attack_Player(Player *p, int num_Attack)
 {
     
     int Temp_Grid[GRID_VERTICAL][GRID_HORIZONTAL];
@@ -1180,7 +1182,7 @@ void Attack_Player(struct Player *p, int num_Attack)
 
 
 // Enable to play function for each player
-void Play_Game(struct Player *p, int *frames, Sound *s_arrival, Sound *s_rotation, Sound *s_destroy)
+void Play_Game(Player *p, int *frames, Sound *s_arrival, Sound *s_rotation, Sound *s_destroy)
 {
     Block_Create(frames, p, s_arrival);
     Block_Control(p, s_arrival, s_rotation);
