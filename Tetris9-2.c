@@ -1117,7 +1117,7 @@ static void BlockLine_Delete(Player *p, Sound *s)
             }
             
             Deleted_Line = -1;
-            i--;
+            i++;
             p->Attack++;        // Attack On
         }
     }
