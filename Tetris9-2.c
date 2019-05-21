@@ -1021,31 +1021,35 @@ static bool Check_Blocks_Collision(Player *p, int ArrayX[], int ArrayY[], int x,
 static bool Check_Wall(int Array[], int ch, int i)
 {
     
-    // ASCII '>' = 62
-    if (ch == 62)
+    // ASCII
+    switch (ch)
     {
-        if( Array[0] > i && Array[1] > i && Array[2] > i && Array[3] > i )
-            return true;
-        else
-            return false;
-    }
-    
-    // ASCII '=' = 61
-    else if (ch == 61)
-    {
-        if( Array[0] == i || Array[1] == i || Array[2] == i || Array[3] == i )
-            return true;
-        else
-            return false;
-    }
-    
-    // ASCII '<' = 60
-    else if (ch == 60)
-    {
-        if( Array[0] < i && Array[1] < i && Array[2] < i && Array[3] < i )
-            return true;
-        else
-            return false;
+        case 62:
+        {
+            if( Array[0] > i && Array[1] > i && Array[2] > i && Array[3] > i )
+                return true;
+            else
+                return false;
+        }
+        break;
+        
+        case 61:
+        {
+            if( Array[0] == i || Array[1] == i || Array[2] == i || Array[3] == i )
+                return true;
+            else
+                return false;
+        }
+        break;
+        
+        case 60:
+        {
+            if( Array[0] < i && Array[1] < i && Array[2] < i && Array[3] < i )
+                return true;
+            else
+                return false;
+        }
+        break;
     }
     
     return false;
