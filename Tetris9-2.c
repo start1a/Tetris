@@ -5,7 +5,7 @@
 #define MAX_CIRCLES  64
 
 // Function
-static void Init_Game();
+static void Init_Player();
 static void Draw_InitGame();
 static void Block_Create();
 static void Block_Save();
@@ -17,14 +17,23 @@ static void Block_Change();
 static void BlockLine_Delete();
 static void Play_Game();
 void Attack_Player();
+static void Init_Game();
 
 
 
 // Global variables
+int frames = 0;
 int num_Player = 0;
 static Color color[8] = { VIOLET, RED, PURPLE, BLUE, GREEN, YELLOW, LIME, GRAY };
 typedef enum { MAIN, COUNT, PLAY, END } GameScreen;
 GameScreen gameScreen = MAIN;
+Sound sound_click;
+Sound sound_rotation;
+Sound sound_arrival;
+Sound sound_destroy;
+Sound sound_count3;
+Sound sound_count2;
+Sound sound_count1;
 
 
 
@@ -64,19 +73,18 @@ int main()
     //--------------------------------------------------------------------------------------
     int screenWidth = 1600;
     int screenHeight = 1000;
-    int frames = 0;
     int startCount = 3;
     bool on_Countsound[3] = {0};
     
     // Sound ------------------------------------
     InitAudioDevice();
-    Sound sound_click = LoadSound("ClickButton.wav");
-    Sound sound_rotation = LoadSound("Rotation.wav");
-    Sound sound_arrival = LoadSound("Arrival.wav");
-    Sound sound_destroy = LoadSound("Destroy.wav");
-    Sound sound_count3 = LoadSound("Count3.wav");
-    Sound sound_count2 = LoadSound("Count2.wav");
-    Sound sound_count1 = LoadSound("Count1.wav");
+    sound_click = LoadSound("ClickButton.wav");
+    sound_rotation = LoadSound("Rotation.wav");
+    sound_arrival = LoadSound("Arrival.wav");
+    sound_destroy = LoadSound("Destroy.wav");
+    sound_count3 = LoadSound("Count3.wav");
+    sound_count2 = LoadSound("Count2.wav");
+    sound_count1 = LoadSound("Count1.wav");
     
     SetSoundVolume(sound_destroy, 0.2);
     SetSoundVolume(sound_click, 0.2);
@@ -175,24 +183,18 @@ int main()
                     // solo
                     if (GetMouseX() > (screenWidth/4) && GetMouseX() < (screenWidth*3)/4 && GetMouseY() > 380 && GetMouseY() < 480)
                     {
-                        Init_Game(&p1);
+                        Init_Player(&p1);
                         num_Player = 1;
-                        startCount = 3;
-                        PlaySound(sound_click);
-                        for (int i = 0; i < 3; i++) on_Countsound[i] = false;
-                        gameScreen = COUNT;
+                        Init_Game(&startCount, on_Countsound);
                     }
                     
                     // duo
                     else if (GetMouseX() > (screenWidth/4) && GetMouseX() < (screenWidth*3)/4 && GetMouseY() > 500 && GetMouseY() < 600)
                     {
-                        Init_Game(&p1);
-                        Init_Game(&p2);
+                        Init_Player(&p1);
+                        Init_Player(&p2);
                         num_Player = 2;
-                        startCount = 3;
-                        PlaySound(sound_click);
-                        for (int i = 0; i < 3; i++) on_Countsound[i] = false;
-                        gameScreen = COUNT;
+                        Init_Game(&startCount, on_Countsound);
                     }
                     
                     // trio
@@ -261,11 +263,11 @@ int main()
                 switch (num_Player)
                 {
                     case 1:
-                        Play_Game(&p1, &frames, &sound_arrival, &sound_rotation, &sound_destroy);
+                        Play_Game(&p1);
                         break;
                     case 2:
-                        Play_Game(&p1, &frames, &sound_arrival, &sound_rotation, &sound_destroy);
-                        Play_Game(&p2, &frames, &sound_arrival, &sound_rotation, &sound_destroy);
+                        Play_Game(&p1);
+                        Play_Game(&p2);
                         
                             if (p1.Attack > 0)
                             {
@@ -353,7 +355,7 @@ int main()
 
 
 
-static void Init_Game(Player *p)
+static void Init_Player(Player *p)
 {
     for(int i = 0; i < GRID_VERTICAL; i++)
     {
@@ -380,7 +382,13 @@ static void Init_Game(Player *p)
 }
 
 
-
+static void Init_Game(int startCount, int on_Countsound[])
+{
+    startCount = 3;
+    PlaySound(sound_click);
+    for (int i = 0; i < 3; i++) on_Countsound[i] = false;
+    gameScreen = COUNT;
+}
 
 // Draw Tetris GridLine
 static void Draw_InitGame()
@@ -420,7 +428,7 @@ static void Draw_InitGame()
 
 
 // Random Block Selected
-static void Block_Create(int* frames, Player *p, Sound *s_arrival)
+static void Block_Create(Player *p)
 {
     if (p->block_Arrival)
     {
@@ -509,14 +517,14 @@ static void Block_Create(int* frames, Player *p, Sound *s_arrival)
     
     
     // Go down Block per 0.8 second
-    if (((*frames / 50) % 2) == 1)
+    if (((frames / 50) % 2) == 1)
     {
         
         // Is block arrive floor?
         if (Check_Wall(p->blockX, '=', 19) || Check_Blocks_Collision(p ,p->blockX, p->blockY, 1, 0))
         {
             p->block_Arrival = true;                                                           // Arrive & Save
-            PlaySound(*s_arrival);
+            PlaySound(sound_arrival);
             
             for (int i = 0; i < 4; i++)
                 p->Grid[p->blockX[i]][p->blockY[i]] = p->block_number;
@@ -585,7 +593,7 @@ static void Block_Save(Player *p)
 
 
 // Control the Block by using Direction Key
-void Block_Control(Player *p, Sound *s_arrival, Sound *s_rotation)
+void Block_Control(Player *p)
 {
     
     // Block is Arrive immediately
@@ -595,7 +603,7 @@ void Block_Control(Player *p, Sound *s_arrival, Sound *s_rotation)
             p->Grid[p->block_arriveX[i]][p->block_arriveY[i]] = p->block_number;
         p->block_Arrival = true;
         
-        PlaySound(*s_arrival);
+        PlaySound(sound_arrival);
     }
     
     
@@ -653,7 +661,7 @@ void Block_Control(Player *p, Sound *s_arrival, Sound *s_rotation)
     // Transform Block
     if (IsKeyPressed(KEY_UP) && p->player_number == 2 || IsKeyPressed(KEY_R) && p->player_number == 1)
     {
-        PlaySound(*s_rotation);
+        PlaySound(sound_rotation);
         
         switch(p->block_number)
         {
@@ -1066,7 +1074,7 @@ static void Block_Change(int Array_X1[], int Array_Y1[], int Array_X2[], int Arr
 
 
 // Delete full block line
-static void BlockLine_Delete(Player *p, Sound *s)
+static void BlockLine_Delete(Player *p)
 {
     
     int Deleted_Line = -1;
@@ -1084,7 +1092,7 @@ static void BlockLine_Delete(Player *p, Sound *s)
         
         if ( saved_block == GRID_HORIZONTAL )
         {
-            PlaySound(*s);
+            PlaySound(sound_destroy);
             Deleted_Line = i;
             saved_block = 0;
 
@@ -1182,10 +1190,10 @@ void Attack_Player(Player *p, int num_Attack)
 
 
 // Enable to play function for each player
-void Play_Game(Player *p, int *frames, Sound *s_arrival, Sound *s_rotation, Sound *s_destroy)
+void Play_Game(Player *p)
 {
-    Block_Create(frames, p, s_arrival);
-    Block_Control(p, s_arrival, s_rotation);
-    BlockLine_Delete(p, s_destroy);
+    Block_Create(p);
+    Block_Control(p);
+    BlockLine_Delete(p);
     Block_Save(p);
 }
