@@ -47,7 +47,7 @@ typedef struct{
     int block_number_adjust;
     int block_location;
     int blockX[4];          // vertical coordinate
-    int blockY[4];          // horicontal coordinate
+    int blockY[4];          // horizontal coordinate
     int next_blockX[4];
     int next_blockY[4];
     int pre_blockX[4];
