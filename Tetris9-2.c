@@ -46,8 +46,8 @@ typedef struct{
     int block_number2;
     int block_number_adjust;
     int block_location;
-    int blockX[4];          // vertical coordinate
-    int blockY[4];          // horizontal coordinate
+    int blockX[4];
+    int blockY[4];
     int next_blockX[4];
     int next_blockY[4];
     int pre_blockX[4];
@@ -131,7 +131,6 @@ int main()
     {
         
         BeginDrawing();
-        
         switch (gameScreen)
         {
             case MAIN:
@@ -382,9 +381,9 @@ static void Init_Player(Player *p)
 }
 
 
-static void Init_Game(int startCount, int on_Countsound[])
+static void Init_Game(int *startCount, int on_Countsound[])
 {
-    startCount = 3;
+    *startCount = 3;
     PlaySound(sound_click);
     for (int i = 0; i < 3; i++) on_Countsound[i] = false;
     gameScreen = COUNT;
@@ -395,12 +394,13 @@ static void Draw_InitGame()
 {
 
     ClearBackground(RAYWHITE);
+    
     // game explanation
     DrawText("R : Transform, F : Down, D,G : <-->", 50, 900, 30, RED);
     DrawText("LShift : Immeditely Arrive", 50, 940, 30, RED);
     DrawText("Uarrow : Transform, Darrow : Down, L,Rarrow : <-->", 700, 900, 30, BLUE);
     DrawText("RShift : Immeditely Arrive", 700, 940, 30, BLUE);
-
+    
     // Draw horizontal Line
     for (int i = 0; i < GRID_VERTICAL+1; i++)
     {
